@@ -10,4 +10,6 @@ class RegisrationService(
     fun getAllUsers(): List<User> {
         return userRepository.findAll()
     }
+
+
 }

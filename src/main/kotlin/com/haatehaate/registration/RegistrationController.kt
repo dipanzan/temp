@@ -1,21 +1,22 @@
 package com.haatehaate.registration
 
-import com.haatehaate.utils.common.InputValidator
+import com.haatehaate.utils.validator.RegistrationValidator
 import com.haatehaate.utils.exception.BadRequestException
+import com.haatehaate.response.ErrorResponse
+import com.haatehaate.response.SuccessResponse
+import com.haatehaate.utils.validator.Validation
+import com.haatehaate.utils.validator.Validator
 import lombok.extern.slf4j.Slf4j
-import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.annotation.*
 
 @Slf4j
 @RestController
 @RequestMapping("/registration")
 class RegistrationController(
-    private val regisrationService: RegisrationService
+        private val regisrationService: RegisrationService
 ) {
-
-    @GetMapping("hello")
+    @GetMapping("/hello")
     fun hello(): String {
         throw BadRequestException("Bahahahaha!")
     }
@@ -23,15 +24,12 @@ class RegistrationController(
     @ResponseBody
     @PostMapping("/new-user")
     fun registerUser(@RequestBody registrationForm: RegistrationForm): ResponseEntity<Any> {
+        val validator: Validator = RegistrationValidator()
+        val validatedForm = validator.validate(registrationForm)
 
-
-
-        return ResponseEntity.ok("ALL GOOD")
-    }
-
-    private fun isValidUserCredentials(registrationForm: RegistrationForm) {
-
-        InputValidator.isValidPhone(registrationForm.phone)
-        registrationForm.phone
+        return when (validatedForm) {
+            is Validation.Error -> ResponseEntity.ok(ErrorResponse(validatedForm.error))
+            else -> ResponseEntity.ok(SuccessResponse("ALL GOOD"))
+        }
     }
 }
