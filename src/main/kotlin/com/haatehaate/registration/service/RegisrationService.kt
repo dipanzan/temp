@@ -1,6 +1,7 @@
-package com.haatehaate.registration
+package com.haatehaate.registration.service
 
 import com.haatehaate.entity.User
+import com.haatehaate.registration.repository.UserRepository
 import org.springframework.stereotype.Service
 
 @Service

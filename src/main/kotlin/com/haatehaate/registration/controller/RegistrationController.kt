@@ -1,5 +1,8 @@
-package com.haatehaate.registration
+package com.haatehaate.registration.controller
 
+import com.haatehaate.registration.InvalidRegistrationException
+import com.haatehaate.registration.model.RegistrationForm
+import com.haatehaate.registration.service.RegisrationService
 import com.haatehaate.utils.validator.RegistrationValidator
 import com.haatehaate.utils.exception.BadRequestException
 import com.haatehaate.response.ErrorResponse
@@ -24,12 +27,14 @@ class RegistrationController(
     @ResponseBody
     @PostMapping("/new-user")
     fun registerUser(@RequestBody registrationForm: RegistrationForm): ResponseEntity<Any> {
-        val validator: Validator = RegistrationValidator()
+        /*val validator: Validator = RegistrationValidator()
         val validatedForm = validator.validate(registrationForm)
 
         return when (validatedForm) {
             is Validation.Error -> ResponseEntity.ok(ErrorResponse(validatedForm.error))
             else -> ResponseEntity.ok(SuccessResponse("ALL GOOD"))
-        }
+        }*/
+
+        throw InvalidRegistrationException("HAHA")
     }
 }

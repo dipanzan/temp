@@ -2,8 +2,8 @@ package com.haatehaate.utils.validator
 
 import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
-import com.haatehaate.registration.InvalidCredentialsException
-import com.haatehaate.registration.RegistrationForm
+import com.haatehaate.utils.exception.InvalidCredentialsException
+import com.haatehaate.registration.model.RegistrationForm
 import lombok.extern.slf4j.Slf4j
 import java.util.regex.Pattern
 
@@ -56,11 +56,9 @@ class RegistrationValidator : Validator {
         return try {
             val phoneNumberUtil = PhoneNumberUtil.getInstance()
             val phone = phoneNumberUtil.parse(phoneNumber, REGION_BD)
-            return if (phoneNumberUtil.isValidNumber(phone)) {
-                Validation.Success
-            } else {
-                Validation.Error(INVALID_PHONE_NUMBER)
-            }
+            return if (phoneNumberUtil.isValidNumber(phone)) Validation.Success else Validation.Error(
+                INVALID_PHONE_NUMBER
+            )
         } catch (e: NumberParseException) {
             Validation.Error(INVALID_PHONE_NUMBER)
         }
@@ -70,11 +68,17 @@ class RegistrationValidator : Validator {
         if (input.isEmpty()) {
             return Validation.Error(FIELD_EMPTY)
         }
-        return if (isValidPattern(input, PASSWORD_PATTERN)) Validation.Success else Validation.Error(PASSWORD_NOT_STRONG)
+        return if (isValidPattern(
+                input,
+                PASSWORD_PATTERN
+            )
+        ) Validation.Success else Validation.Error(PASSWORD_NOT_STRONG)
     }
 
     private fun passwordsMatch(password: String, confirmedPassword: String): Validation {
-        return if (password.contentEquals(confirmedPassword)) Validation.Success else Validation.Error(PASSWORDS_DO_NOT_MATCH)
+        return if (password.contentEquals(confirmedPassword)) Validation.Success else Validation.Error(
+            PASSWORDS_DO_NOT_MATCH
+        )
     }
 
     private fun isValidPattern(input: String, pattern: String): Boolean {

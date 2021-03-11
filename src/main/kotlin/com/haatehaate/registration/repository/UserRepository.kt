@@ -1,4 +1,4 @@
-package com.haatehaate.registration
+package com.haatehaate.registration.repository
 
 import com.haatehaate.entity.User
 import org.springframework.data.jpa.repository.JpaRepository
