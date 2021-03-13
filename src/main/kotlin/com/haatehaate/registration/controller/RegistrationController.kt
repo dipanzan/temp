@@ -1,12 +1,11 @@
 package com.haatehaate.registration.controller
 
 import com.haatehaate.registration.InvalidRegistrationException
-import com.haatehaate.registration.model.RegistrationForm
-import com.haatehaate.registration.service.RegisrationService
-import com.haatehaate.utils.validator.RegistrationValidator
-import com.haatehaate.utils.exception.BadRequestException
-import com.haatehaate.response.ErrorResponse
+import com.haatehaate.registration.model.RegistrationInfo
+import com.haatehaate.registration.service.UserService
+import com.haatehaate.response.FailedResponse
 import com.haatehaate.response.SuccessResponse
+import com.haatehaate.utils.validator.InputValidator
 import com.haatehaate.utils.validator.Validation
 import com.haatehaate.utils.validator.Validator
 import lombok.extern.slf4j.Slf4j
@@ -15,26 +14,38 @@ import org.springframework.web.bind.annotation.*
 
 @Slf4j
 @RestController
-@RequestMapping("/registration")
+@RequestMapping("/user/registration")
 class RegistrationController(
-        private val regisrationService: RegisrationService
+    private val userService: UserService
 ) {
-    @GetMapping("/hello")
-    fun hello(): String {
-        throw BadRequestException("Bahahahaha!")
+
+    @ResponseBody
+    @PostMapping("/new")
+    fun registerUser(@RequestBody registrationInfo: RegistrationInfo): ResponseEntity<Any> {
+        val validator: Validator = InputValidator()
+        val validationStatus = validator.validate(registrationInfo)
+
+        val userExists = userService.existsUserByPhone(registrationInfo.phone)
+
+        if (userExists) {
+            println("USER PRESENT")
+        } else {
+            println("USER NOT PRESENT")
+        }
+
+        return when (validationStatus) {
+            is Validation.Success -> ResponseEntity.ok().body(SuccessResponse(validator.validationResult))
+            is Validation.Error -> ResponseEntity.ok().body(FailedResponse(validator.validationResult))
+        }
+    }
+
+    private fun checkIfAccountAlreadyExists() {
     }
 
     @ResponseBody
-    @PostMapping("/new-user")
-    fun registerUser(@RequestBody registrationForm: RegistrationForm): ResponseEntity<Any> {
-        /*val validator: Validator = RegistrationValidator()
-        val validatedForm = validator.validate(registrationForm)
-
-        return when (validatedForm) {
-            is Validation.Error -> ResponseEntity.ok(ErrorResponse(validatedForm.error))
-            else -> ResponseEntity.ok(SuccessResponse("ALL GOOD"))
-        }*/
-
+    @PostMapping("/confirm-otp")
+    fun temp(): ResponseEntity<Any> {
         throw InvalidRegistrationException("HAHA")
+        TODO("TODO")
     }
 }

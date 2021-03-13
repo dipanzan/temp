@@ -1,6 +1,6 @@
 package com.haatehaate.registration.model
 
-data class RegistrationForm(
+data class RegistrationInfo(
         val phone: String,
         val password: String,
         val confirmedPassword: String
