@@ -1,8 +1,9 @@
 package com.haatehaate.registration.controller
 
+import com.haatehaate.entity.User
 import com.haatehaate.registration.InvalidRegistrationException
-import com.haatehaate.registration.model.RegistrationInfo
-import com.haatehaate.registration.service.UserService
+import com.haatehaate.registration.dto.RegistrationInfo
+import com.haatehaate.UserService
 import com.haatehaate.response.FailedResponse
 import com.haatehaate.response.SuccessResponse
 import com.haatehaate.utils.validator.InputValidator

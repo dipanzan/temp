@@ -10,12 +10,10 @@ data class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int,
-    /*@Column(name = "uuid")
-    val uuid: UUID = UUID.randomUUID(),*/
+    @Column(name = "uuid", nullable = true)
+    val uuid: UUID = UUID.randomUUID(),
     @Column(name = "phone", length = 14, unique = true, nullable = false)
     val phone: String,
     @Column(name = "password", nullable = false)
-    val password: String,
-    @Column(name = "registered_at")
-    val registeredAt: String = LocalDateTime.now().toString()
+    val password: String
 )

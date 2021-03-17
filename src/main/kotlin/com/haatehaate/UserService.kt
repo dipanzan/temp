@@ -1,4 +1,4 @@
-package com.haatehaate.registration.service
+package com.haatehaate
 
 import com.haatehaate.entity.User
 import com.haatehaate.registration.repository.UserRepository
@@ -9,14 +9,15 @@ import java.util.*
 class UserService(
     private val userRepository: UserRepository
 ) {
+    fun registerUser(user: User): Optional<User> {
+        return Optional.of(userRepository.save(user))
+    }
 
     fun existsUserByPhone(phone: String): Boolean {
         return userRepository.existsUserByPhone(phone)
     }
 
-    fun registerUser(user: User) {
-        userRepository.save(user)
+    fun findUserByPhoneAndPassword(phone: String, password: String): Optional<User> {
+        return userRepository.findUserByPhoneAndPassword(phone, password)
     }
-
-
 }

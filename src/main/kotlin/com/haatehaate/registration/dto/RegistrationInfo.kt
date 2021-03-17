@@ -1,4 +1,4 @@
-package com.haatehaate.registration.model
+package com.haatehaate.registration.dto
 
 data class RegistrationInfo(
         val phone: String,

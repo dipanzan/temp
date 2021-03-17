@@ -3,7 +3,7 @@ package com.haatehaate.utils.validator
 import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.haatehaate.registration.InvalidRegistrationException
-import com.haatehaate.registration.model.RegistrationInfo
+import com.haatehaate.registration.dto.RegistrationInfo
 import lombok.extern.slf4j.Slf4j
 import org.passay.LengthRule
 
