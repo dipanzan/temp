@@ -2,35 +2,24 @@ package com.haatehaate.utils.validator
 
 import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
-import com.haatehaate.registration.InvalidRegistrationException
-import com.haatehaate.registration.dto.RegistrationInfo
-import lombok.extern.slf4j.Slf4j
-import org.passay.LengthRule
+import com.haatehaate.registration.dto.RegistrationRequest
+import org.passay.*
+import org.springframework.stereotype.Component
 
-import org.passay.PasswordValidator
-import org.passay.RuleResult
+interface RegistrationValidator {
+    fun validateRegistrationRequest(registrationRequest: RegistrationRequest): Map<String, Validation>
+}
 
-import org.passay.PasswordData
-
-import org.passay.EnglishCharacterData
-
-import org.passay.CharacterRule
-
-import org.passay.WhitespaceRule
-
-
-@Slf4j
-class InputValidator : Validator {
+@Component
+class InputValidator : RegistrationValidator {
     companion object {
         private const val REGION_BD = "BD"
-
-        // Error Messages
-        private const val PHONE = "phone"
+        private const val USERNAME = "username"
         private const val PASSWORD = "password"
         private const val CONFIRMED_PASSWORD = "confirmed_password"
-        private const val INVALID_PHONE_NUMBER = "Invalid phone number"
-        private const val PASSWORDS_DO_NOT_MATCH = "Passwords do not match"
-        private const val INVALID_REGISTRATION = "Invalid registration parameters"
+        private const val INVALID_PHONE_NUMBER = "Invalid phone number, should consist of 13 digits."
+        private const val PASSWORDS_DO_NOT_MATCH = "Passwords do not match."
+        private const val INVALID_REGISTRATION = "Invalid registration parameters."
 
         private val passwordValidator = PasswordValidator(
             listOf(
@@ -44,29 +33,25 @@ class InputValidator : Validator {
         )
     }
 
-    override var validationResult: Map<String, Validation> = emptyMap()
+    override fun validateRegistrationRequest(registrationRequest: RegistrationRequest): Map<String, Validation> {
+        val validatedRegistration = mutableMapOf<String, Validation>()
 
-    override fun validate(inputs: Any): Validation {
-        if (inputs !is RegistrationInfo) {
-            throw InvalidRegistrationException(INVALID_REGISTRATION)
-        }
+        val validUsername = isValidUsername(registrationRequest.username)
+        val validPassword = isValidPassword(registrationRequest.password)
+        val validConfirmedPassword =
+            passwordEqualsConfirmedPassword(registrationRequest.password, registrationRequest.confirmedPassword)
 
-        validationResult = mapOf(
-            PHONE to isValidPhone(inputs.phone),
-            PASSWORD to isValidPassword(inputs.password),
-            CONFIRMED_PASSWORD to isValidPasswords(inputs.password, inputs.confirmedPassword)
-        )
+        validatedRegistration.putIfAbsent(USERNAME, validUsername)
+        validatedRegistration.putIfAbsent(PASSWORD, validPassword)
+        validatedRegistration.putIfAbsent(CONFIRMED_PASSWORD, validConfirmedPassword)
 
-        validationResult.values.forEach {
-            if (it is Validation.Error) return Validation.Error(INVALID_REGISTRATION)
-        }
-        return Validation.Success
+        return validatedRegistration
     }
 
-    private fun isValidPhone(phone: String): Validation {
+    private fun isValidUsername(username: String): Validation {
         return try {
             val phoneNumberUtil = PhoneNumberUtil.getInstance()
-            val phone = phoneNumberUtil.parse(phone, REGION_BD)
+            val phone = phoneNumberUtil.parse(username, REGION_BD)
 
             return if (phoneNumberUtil.isValidNumber(phone)) {
                 Validation.Success
@@ -89,7 +74,7 @@ class InputValidator : Validator {
         }
     }
 
-    private fun isValidPasswords(password: String, confirmedPassword: String): Validation {
+    private fun passwordEqualsConfirmedPassword(password: String, confirmedPassword: String): Validation {
         return if (password.contentEquals(confirmedPassword)) {
             Validation.Success
         } else {

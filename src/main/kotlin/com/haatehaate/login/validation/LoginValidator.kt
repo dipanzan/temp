@@ -1,17 +1,17 @@
 package com.haatehaate.login.validation
 
-import com.haatehaate.login.LoginForm
+import com.haatehaate.login.LoginRequest
 import javax.validation.ConstraintValidator
 import javax.validation.ConstraintValidatorContext
 
 
-class LoginValidator : ConstraintValidator<ValidLogin, LoginForm> {
+class LoginValidator : ConstraintValidator<ValidLogin, LoginRequest> {
     override fun isValid(
-        loginForm: LoginForm?,
+        loginRequest: LoginRequest?,
         constraintValidatorContext: ConstraintValidatorContext?
     ): Boolean {
-        return loginForm?.let {
-            it.phone.isNotBlank() && it.password.isNotBlank()
+        return loginRequest?.let {
+            it.username.isNotBlank() && it.password.isNotBlank()
         } ?: false
     }
 }
