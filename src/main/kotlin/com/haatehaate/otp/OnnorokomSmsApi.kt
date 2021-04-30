@@ -23,7 +23,7 @@ data class OnnorokomSmsApi(
         const val ERROR_END = 1911
     }
 
-    enum class StatusCodes(val code: Int) {
+    enum class ErrorCodes(val responseCode: Int) {
         SUCCESS(1900),
         PARAMETER_CONTENT_MISSING(1901),
         INVALID_USER_OR_PASS(1902),
@@ -34,6 +34,15 @@ data class OnnorokomSmsApi(
         SMS_BODY_TOO_LONG(1908),
         DUPLICATE_CAMPAIGN_NAME(1909),
         INVALID_MESSAGE(1910),
-        TOO_MANY_SMS_REQUEST(1911)
+        TOO_MANY_SMS_REQUEST(1911);
+
+        companion object {
+            fun getErrorMessage(responseCode: Int): String {
+                values().forEach {
+                    if (responseCode == it.responseCode) return it.toString()
+                }
+                return SUCCESS.toString()
+            }
+        }
     }
 }

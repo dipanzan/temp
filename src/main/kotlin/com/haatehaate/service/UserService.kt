@@ -32,17 +32,17 @@ class UserService(
         return user.get()
     }
 
-    private fun checkIfUserDoesNotExist(username: String)  {
-        if (!userRepository.existsUserByUsername(username)) {
-            throw InvalidLoginException("Username $username does not exist, please register an account.")
-        }
-    }
-
     fun setupRegistrationForNewUser(registrationRequest: RegistrationRequest) {
         validateRegistrationRequest(registrationRequest)
         checkIfUserExists(registrationRequest.username)
 
 
+    }
+
+    private fun checkIfUserDoesNotExist(username: String)  {
+        if (!userRepository.existsUserByUsername(username)) {
+            throw InvalidLoginException("Username $username does not exist, please register an account.")
+        }
     }
 
     private fun checkIfUserExists(username: String) {

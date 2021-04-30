@@ -21,14 +21,7 @@ class LoginController(
     @PostMapping("/login")
     fun login(@RequestBody @Valid loginRequest: LoginRequest): ResponseEntity<Any> {
         val user = userService.loginUser(loginRequest)
-
-
-
         val loginResponse = LoginResponse(success = LoginResponse.Success(user.username, ""))
-
-
-
-
         return ResponseEntity.ok(loginResponse)
     }
 }

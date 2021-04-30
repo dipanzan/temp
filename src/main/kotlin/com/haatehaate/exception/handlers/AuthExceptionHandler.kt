@@ -1,7 +1,10 @@
-package com.haatehaate.exception
+package com.haatehaate.exception.handlers
 
 import com.haatehaate.controller.LoginController
 import com.haatehaate.controller.RegistrationController
+import com.haatehaate.exception.InvalidLoginException
+import com.haatehaate.exception.InvalidRegistrationException
+import com.haatehaate.exception.OtpSmsException
 import com.haatehaate.login.LoginResponse
 import com.haatehaate.registration.RegistrationResponse
 import lombok.extern.log4j.Log4j2
@@ -12,7 +15,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.ResponseStatus
 
-@Log4j2
 @ControllerAdvice(assignableTypes = [LoginController::class, RegistrationController::class])
 class AuthExceptionHandler {
     companion object {
@@ -44,7 +46,7 @@ class AuthExceptionHandler {
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(OtpSmsException::class)
-    fun handleOtpsSmsException(): Unit {
-
+    fun handleOtpsSmsException(ex: OtpSmsException): RegistrationResponse {
+        return RegistrationResponse(error = RegistrationResponse.Error(ex.reason))
     }
 }

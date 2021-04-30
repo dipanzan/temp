@@ -36,8 +36,8 @@ class InputValidator : RegistrationValidator {
     override fun validateRegistrationRequest(registrationRequest: RegistrationRequest): Map<String, Validation> {
         val validatedRegistration = mutableMapOf<String, Validation>()
 
-        val validUsername = isValidUsername(registrationRequest.username)
-        val validPassword = isValidPassword(registrationRequest.password)
+        val validUsername = isValidUsername1(registrationRequest.username)
+        val validPassword = isValidPassword1(registrationRequest.password)
         val validConfirmedPassword =
             passwordEqualsConfirmedPassword(registrationRequest.password, registrationRequest.confirmedPassword)
 
@@ -48,7 +48,25 @@ class InputValidator : RegistrationValidator {
         return validatedRegistration
     }
 
-    private fun isValidUsername(username: String): Validation {
+    fun isValidUsername(username: String): Boolean {
+        return try {
+            val phoneNumberUtil = PhoneNumberUtil.getInstance()
+            val phone = phoneNumberUtil.parse(username, REGION_BD)
+
+            return (phoneNumberUtil.isValidNumber(phone))
+        } catch (e: NumberParseException) {
+            false
+        }
+    }
+
+    fun isValidPassword(password: String): Boolean {
+        val passwordData = PasswordData(password)
+        val ruleResult: RuleResult = passwordValidator.validate(passwordData)
+
+        return ruleResult.isValid
+    }
+
+    private fun isValidUsername1(username: String): Validation {
         return try {
             val phoneNumberUtil = PhoneNumberUtil.getInstance()
             val phone = phoneNumberUtil.parse(username, REGION_BD)
@@ -63,7 +81,7 @@ class InputValidator : RegistrationValidator {
         }
     }
 
-    private fun isValidPassword(password: String): Validation {
+    private fun isValidPassword1(password: String): Validation {
         val passwordData = PasswordData(password)
         val ruleResult: RuleResult = passwordValidator.validate(passwordData)
 

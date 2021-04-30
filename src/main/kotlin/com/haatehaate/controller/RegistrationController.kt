@@ -18,16 +18,15 @@ class RegistrationController(
     @PostMapping("/new")
     fun registerNewUser(@RequestBody @Valid registrationRequest: RegistrationRequest): ResponseEntity<Any> {
         userService.setupRegistrationForNewUser(registrationRequest)
-        val registrationResponse = RegistrationResponse(pending = RegistrationResponse.Pending(registrationRequest.username))
-
         otpService.sendOtp(registrationRequest.username)
 
+        val registrationResponse = RegistrationResponse(pending = RegistrationResponse.Pending(registrationRequest.username))
         return ResponseEntity.ok(registrationResponse)
     }
 
     @ResponseBody
     @PostMapping("/confirm-otp")
-    fun confirmUserRegistrationWithOtp(@RequestBody otpRequest: OptRequest) {
+    fun confirmUserRegistrationWithOtp(@RequestBody @Valid otpRequest: OtpRequest) {
 
     }
  }
