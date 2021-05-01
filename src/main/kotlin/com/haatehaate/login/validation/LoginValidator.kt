@@ -1,4 +1,4 @@
-package com.haatehaate.validation
+package com.haatehaate.login.validation
 
 import com.haatehaate.login.LoginRequest
 import com.haatehaate.utils.validator.InputValidator

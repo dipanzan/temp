@@ -2,7 +2,7 @@ package com.haatehaate.utils.validator
 
 import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
-import com.haatehaate.registration.dto.RegistrationRequest
+import com.haatehaate.registration.request.RegistrationRequest
 import org.passay.*
 import org.springframework.stereotype.Component
 
@@ -53,7 +53,7 @@ class InputValidator : RegistrationValidator {
             val phoneNumberUtil = PhoneNumberUtil.getInstance()
             val phone = phoneNumberUtil.parse(username, REGION_BD)
 
-            return (phoneNumberUtil.isValidNumber(phone))
+            return phoneNumberUtil.isValidNumber(phone)
         } catch (e: NumberParseException) {
             false
         }

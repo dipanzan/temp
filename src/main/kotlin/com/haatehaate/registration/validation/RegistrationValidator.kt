@@ -1,6 +1,6 @@
 package com.haatehaate.registration.validation
 
-import com.haatehaate.registration.dto.RegistrationRequest
+import com.haatehaate.registration.request.RegistrationRequest
 import javax.validation.ConstraintValidator
 import javax.validation.ConstraintValidatorContext
 

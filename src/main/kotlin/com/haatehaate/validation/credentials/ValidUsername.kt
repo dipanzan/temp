@@ -1,11 +1,11 @@
-package com.haatehaate.validation
+package com.haatehaate.validation.credentials
 
 import com.haatehaate.utils.validator.Messages
 import javax.validation.Constraint
 import kotlin.reflect.KClass
 
 @MustBeDocumented
-@Target(AnnotationTarget.PROPERTY, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.PROPERTY_GETTER)
+@Target(AnnotationTarget.PROPERTY_GETTER)
 @Retention(AnnotationRetention.RUNTIME)
 @Constraint(validatedBy = [UsernameValidator::class])
 annotation class ValidUsername(

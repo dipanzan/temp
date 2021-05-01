@@ -5,6 +5,7 @@ import com.haatehaate.utils.validator.Messages
 import com.haatehaate.utils.validator.logger
 import org.springframework.context.MessageSource
 import org.springframework.http.HttpStatus
+import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.validation.FieldError
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -20,14 +21,15 @@ class ApiExceptionHandler(
         private val log = logger()
     }
 
-    /*@ResponseBody
+    @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(HttpMessageNotReadableException::class)
     fun handleHttpMessageNotReadable(
         ex: HttpMessageNotReadableException,
     ): ApiError {
-        return ApiError(REQUEST_BODY_INVALID, ex.localizedMessage)
-    }*/
+        log.debug(ex.stackTraceToString(), ex)
+        return ApiError(HttpStatus.BAD_REQUEST, ex.localizedMessage)
+    }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -45,7 +47,7 @@ class ApiExceptionHandler(
         val validationErrors = mutableListOf<ApiError.ValidationError>()
 
         errors.forEach {
-            var field: String? = it.objectName
+            var field: String = it.objectName
             var message: String? = it.defaultMessage
 
             if (it is FieldError) {

@@ -1,4 +1,4 @@
-package com.haatehaate.validation
+package com.haatehaate.login.validation
 
 import com.haatehaate.utils.validator.Messages.PROVIDE_VALID_CREDENTIALS
 import javax.validation.Constraint

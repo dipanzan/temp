@@ -4,7 +4,7 @@ import com.haatehaate.entity.User
 import com.haatehaate.login.LoginRequest
 import com.haatehaate.exception.InvalidLoginException
 import com.haatehaate.exception.InvalidRegistrationException
-import com.haatehaate.registration.dto.RegistrationRequest
+import com.haatehaate.registration.request.RegistrationRequest
 import com.haatehaate.repository.UserRepository
 import com.haatehaate.utils.validator.RegistrationValidator
 import com.haatehaate.utils.validator.Validation

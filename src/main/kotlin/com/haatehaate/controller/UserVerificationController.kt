@@ -1,8 +1,6 @@
 package com.haatehaate.controller
 
-import com.haatehaate.nid.request.NidVerificationRequest
-import com.haatehaate.nid.request.UserVerificationRequest
-import com.haatehaate.response.PorichoyGovBdApiResponse
+import com.haatehaate.nid.request.VerificationRequest
 import com.haatehaate.service.NidService
 import com.haatehaate.service.UserService
 import org.springframework.http.ResponseEntity
@@ -19,29 +17,11 @@ class UserVerificationController(
     private val nidService: NidService
 ) {
 
-    fun verifyUserNid(@RequestBody @Valid nidVerificationRequest: NidVerificationRequest) {
-        System.err.println("Fullname: ${nidVerificationRequest.fullname}, NID ${nidVerificationRequest.nid}")
-        nidService.prepareBasicNidVerificationRequest(nidVerificationRequest.dateOfBirth.toString(), nidVerificationRequest.nid, nidVerificationRequest.fullname)
-    }
 
     @PostMapping("/nid-brn")
-    fun verifyUser(@RequestBody @Valid userVerificationRequest: UserVerificationRequest): ResponseEntity<Any> {
+    fun verifyUser(@RequestBody @Valid verificationRequest: VerificationRequest): ResponseEntity<Any> {
+        nidService.processVerificationRequest(verificationRequest)
 
-
-
-
-        val nid = userVerificationRequest.nid?.nid
-        val fullname = userVerificationRequest.fullname
-        val dateOfBirth = userVerificationRequest.dateOfBirth.toString()
-
-        val verificationType = userVerificationRequest.verificationType
-
-        System.err.println("hello = $verificationType")
-
-        val test123 = nidService.prepareBasicNidVerificationRequest(dateOfBirth, nid!!, fullname).block()
-
-        System.err.println("PORICHOY: $test123")
-
-        return ResponseEntity.ok().body(test123)
+        return ResponseEntity.ok().body("OK")
     }
 }

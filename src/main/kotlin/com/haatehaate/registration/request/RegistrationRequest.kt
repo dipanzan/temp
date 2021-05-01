@@ -1,4 +1,4 @@
-package com.haatehaate.registration.dto
+package com.haatehaate.registration.request
 
 import com.haatehaate.registration.validation.ValidRegistration
 import javax.validation.constraints.Size

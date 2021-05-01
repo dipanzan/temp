@@ -3,6 +3,7 @@ package com.haatehaate.service
 import com.haatehaate.exception.OtpSmsException
 import com.haatehaate.otp.OnnorokomSmsApi
 import com.haatehaate.otp.OtpGenerator
+import com.haatehaate.utils.validator.logger
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
@@ -19,6 +20,7 @@ class OtpService(
 
     companion object {
         private const val OTP_LENGTH = 5
+        private val log = logger()
     }
 
     fun sendOtp(username: String) {
@@ -31,8 +33,9 @@ class OtpService(
 
     private fun generateOtpSmsFor(username: String): String {
         val otp = otpGenerator.generateOtp(OTP_LENGTH)
-        System.err.println("OTP Generated: " + otp)
-        return "Dear $username, your OTP for HaateHaate is: $otp"
+        log.debug("OTP Generated: $otp")
+
+        return "Dear $username, your OTP is: $otp"
     }
 
     private fun prepareSmsRequest(username: String, sms: String): Mono<String> {
@@ -53,18 +56,17 @@ class OtpService(
         val recipientNumber = tokens[1]
         val responseId = tokens[2]
 
-        System.err.println(tokens)
-        System.err.println("reponseCode: $responseCode, recipientNumber: $recipientNumber, responseId: $responseId")
+        log.debug("reponseCode: $responseCode, recipientNumber: $recipientNumber, responseId: $responseId")
 
         when (responseCode) {
             in OnnorokomSmsApi.ERROR_START..OnnorokomSmsApi.ERROR_END -> generateOtpSmsException(responseCode)
-            else -> TODO("DO DB UPDATE")
+            else -> Unit
         }
     }
 
     @Throws(OtpSmsException::class)
     private fun generateOtpSmsException(responseCode: Int) {
-        val otpApiError = OnnorokomSmsApi.ErrorCodes.getErrorMessage(responseCode)
+        val otpApiError = OnnorokomSmsApi.ResponseCodes.getResponseStatus(responseCode)
         throw OtpSmsException(otpApiError)
     }
 }

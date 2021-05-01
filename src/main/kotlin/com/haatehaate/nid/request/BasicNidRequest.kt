@@ -1,8 +1,10 @@
 package com.haatehaate.nid.request
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import lombok.Builder
 
-data class BasicNidVerificationRequest(
+@Builder
+data class BasicNidRequest(
     @JsonProperty("person_dob")
     val dateOfBirth: String,
 

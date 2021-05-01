@@ -1,7 +1,7 @@
 package com.haatehaate.controller
 
 import com.haatehaate.registration.RegistrationResponse
-import com.haatehaate.registration.dto.RegistrationRequest
+import com.haatehaate.registration.request.RegistrationRequest
 import com.haatehaate.service.OtpService
 import com.haatehaate.service.UserService
 import org.springframework.http.ResponseEntity

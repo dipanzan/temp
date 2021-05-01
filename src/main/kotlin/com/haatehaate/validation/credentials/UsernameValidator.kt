@@ -1,4 +1,4 @@
-package com.haatehaate.validation
+package com.haatehaate.validation.credentials
 
 import com.haatehaate.utils.validator.InputValidator
 import javax.validation.ConstraintValidator
