@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "sms.provider.base_url",
+      "type": "java.lang.String",
+      "description": "Description for sms.provider.base_url."
+  }
+] }

@@ -1,6 +1,6 @@
 package com.haatehaate.login.validation
 
-import com.haatehaate.login.LoginRequest
+import com.haatehaate.login.dto.LoginRequest
 import com.haatehaate.utils.validator.InputValidator
 import com.haatehaate.utils.validator.Messages
 import javax.validation.ConstraintValidator

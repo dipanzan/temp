@@ -1,9 +1,7 @@
 package com.haatehaate.nid.validation
 
-import com.haatehaate.nid.request.Brn
-import com.haatehaate.nid.request.Nid
+import com.haatehaate.nid.dto.VerificationType
 import com.haatehaate.nid.request.VerificationRequest
-import com.haatehaate.nid.request.VerificationType
 import java.util.*
 import javax.validation.ConstraintValidator
 import javax.validation.ConstraintValidatorContext
@@ -33,13 +31,13 @@ class UserVerificationValidator : ConstraintValidator<ValidUserVerification, Ver
         }
     }
 
-    private fun checkNid(nid: Nid?) {
+    private fun checkNid(nid: VerificationRequest.Nid?) {
         if (Objects.isNull(nid)) {
             message = "Please provide NID"
         }
     }
 
-    private fun checkBrn(brn: Brn?) {
+    private fun checkBrn(brn: VerificationRequest.Brn?) {
         if (Objects.isNull(brn)) {
             message = "Please provide BRN"
         }

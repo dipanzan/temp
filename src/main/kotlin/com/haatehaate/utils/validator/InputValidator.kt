@@ -2,16 +2,13 @@ package com.haatehaate.utils.validator
 
 import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
-import com.haatehaate.registration.request.RegistrationRequest
+import com.haatehaate.registration.dto.RegistrationRequest
 import org.passay.*
 import org.springframework.stereotype.Component
 
-interface RegistrationValidator {
-    fun validateRegistrationRequest(registrationRequest: RegistrationRequest): Map<String, Validation>
-}
 
 @Component
-class InputValidator : RegistrationValidator {
+class InputValidator {
     companion object {
         private const val REGION_BD = "BD"
         private const val USERNAME = "username"
@@ -33,21 +30,6 @@ class InputValidator : RegistrationValidator {
         )
     }
 
-    override fun validateRegistrationRequest(registrationRequest: RegistrationRequest): Map<String, Validation> {
-        val validatedRegistration = mutableMapOf<String, Validation>()
-
-        val validUsername = isValidUsername1(registrationRequest.username)
-        val validPassword = isValidPassword1(registrationRequest.password)
-        val validConfirmedPassword =
-            passwordEqualsConfirmedPassword(registrationRequest.password, registrationRequest.confirmedPassword)
-
-        validatedRegistration.putIfAbsent(USERNAME, validUsername)
-        validatedRegistration.putIfAbsent(PASSWORD, validPassword)
-        validatedRegistration.putIfAbsent(CONFIRMED_PASSWORD, validConfirmedPassword)
-
-        return validatedRegistration
-    }
-
     fun isValidUsername(username: String): Boolean {
         return try {
             val phoneNumberUtil = PhoneNumberUtil.getInstance()
@@ -66,37 +48,12 @@ class InputValidator : RegistrationValidator {
         return ruleResult.isValid
     }
 
-    private fun isValidUsername1(username: String): Validation {
-        return try {
-            val phoneNumberUtil = PhoneNumberUtil.getInstance()
-            val phone = phoneNumberUtil.parse(username, REGION_BD)
+    fun passwordEqualsConfirmedPassword(password: String, confirmedPassword: String) =
+        password.contentEquals(confirmedPassword)
 
-            return if (phoneNumberUtil.isValidNumber(phone)) {
-                Validation.Success
-            } else {
-                Validation.Error(INVALID_PHONE_NUMBER)
-            }
-        } catch (e: NumberParseException) {
-            Validation.Error(INVALID_PHONE_NUMBER)
-        }
-    }
-
-    private fun isValidPassword1(password: String): Validation {
-        val passwordData = PasswordData(password)
-        val ruleResult: RuleResult = passwordValidator.validate(passwordData)
-
-        return if (ruleResult.isValid) {
-            Validation.Success
-        } else {
-            Validation.Error(passwordValidator.getMessages(ruleResult))
-        }
-    }
-
-    private fun passwordEqualsConfirmedPassword(password: String, confirmedPassword: String): Validation {
-        return if (password.contentEquals(confirmedPassword)) {
-            Validation.Success
-        } else {
-            Validation.Error(PASSWORDS_DO_NOT_MATCH)
-        }
+    fun isValidOtp(otp: String): Boolean {
+        return otp.toIntOrNull()?.let {
+            otp.length == 5
+        } ?: false
     }
 }
