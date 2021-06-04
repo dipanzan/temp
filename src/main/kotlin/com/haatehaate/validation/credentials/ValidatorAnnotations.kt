@@ -5,7 +5,7 @@ import javax.validation.Constraint
 import kotlin.reflect.KClass
 
 @MustBeDocumented
-@Target(AnnotationTarget.PROPERTY_GETTER)
+@Target(AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
 @Constraint(validatedBy = [UsernameValidator::class])
 annotation class ValidUsername(

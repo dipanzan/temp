@@ -19,12 +19,13 @@ class SmsService(
 ) {
     companion object {
         private val log = logger()
+        private const val OTP_LENGTH = 5
         private const val OTP_REQUEST_LIMIT = 10
     }
 
     fun validateOtp(otpRequest: OtpRequest) {
-        if (smsLogRepository.existsSmsLogByRecipientNumberAndOtpNot(otpRequest.username, otpRequest.otp)) {
-            throw OtpException(Messages.OTP_DID_NOT_MATCH)
+        if (!smsLogRepository.existsByRecipientNumberAndOtp(otpRequest.username, otpRequest.otp)) {
+            throw OtpException(Messages.OTP_DID_NOT_MATCH, path = "/user/registration/resend-otp")
         }
     }
 
@@ -33,42 +34,36 @@ class SmsService(
             throw OtpException(Messages.OTP_REQUESTED_TOO_MANY_TIMES)
         }
 
-        val otp = generateFiveDigitOtp()
+        val otp = generateRandomNewOtp()
         val sms = generateOtpMessage(username, otp)
         val response = sendSmsRequest(username, sms)
-        val smsApiResponse = parseSmsResponse(response)
+        val smsApiResponse = smsApi.parseSmsResponse(response)
 
-        return smsApiResponse?.let {
-            updateSmsLog(it, otp)
-            checkIfOtpSentSuccessfully(it)
-        } ?: throw OtpException(Messages.FAILED_TO_SEND_OTP)
-    }
-
-    private fun parseSmsResponse(response: String?) = smsApi.parseSmsResponse(response)
-
-    private fun checkIfOtpSentSuccessfully(smsApiResponse: SmsApi.SmsApiResponse) {
-        val smsResponseStatus = SmsApi.ResponseStatusCodes.getResponseStatus(smsApiResponse.responseCode)
-
-        when (smsResponseStatus) {
-            SmsApi.ResponseStatusCodes.SUCCESS -> Unit
-            in SmsApi.ResponseStatusCodes.PARAMETER_CONTENT_MISSING..SmsApi.ResponseStatusCodes.TOO_MANY_SMS_REQUEST -> throw OtpException(
-                Messages.FAILED_TO_SEND_OTP
-            )
+        smsApiResponse?.let {
+            updateSmsLog(otp, it)
+            checkIfOtpWasSentSuccessfully(it)
         }
     }
 
-    private fun updateSmsLog(smsApiResponse: SmsApi.SmsApiResponse, otp: String) {
-        val responseCode = smsApiResponse.responseCode
-        val recipientNumber = smsApiResponse.recipientNumber
-        val responseId = smsApiResponse.responseId
-        val responseStatus = SmsApi.ResponseStatusCodes.getResponseStatus(responseCode).toString()
+    fun checkIfOtpWasSentSuccessfully(response: SmsApi.Response) {
+        when (smsApi.getResponseStatus(response.responseCode)) {
+            SmsApi.ResponseStatusCodes.SUCCESS -> Unit
+            in SmsApi.ResponseStatusCodes.PARAMETER_CONTENT_MISSING..SmsApi.ResponseStatusCodes.TOO_MANY_SMS_REQUEST ->
+                throw OtpException(Messages.FAILED_TO_SEND_OTP)
+        }
+    }
+
+    private fun updateSmsLog(otp: String, smsApiResponse: SmsApi.Response) {
+        val responseStatus = smsApi
+            .getResponseStatus(smsApiResponse.responseCode)
+            .toString()
 
         val smsLog = SmsLog(
-            responseCode = responseCode,
-            recipientNumber = recipientNumber,
-            responseId = responseId,
-            responseStatus = responseStatus,
-            otp = otp
+            otp = otp,
+            responseCode = smsApiResponse.responseCode,
+            recipientNumber = smsApiResponse.recipientNumber,
+            responseId = smsApiResponse.responseId,
+            responseStatus = responseStatus
         )
         smsLogRepository.save(smsLog)
     }
@@ -77,21 +72,28 @@ class SmsService(
         return webClient.post()
             .uri {
                 it.apply {
+                    queryParam(smsApi.mobile_key, username)
+                    queryParam(smsApi.sms_text_key, sms)
                     queryParam(smsApi.op_key, smsApi.operation)
                     queryParam(smsApi.api_key, smsApi.api)
                     queryParam(smsApi.sms_type_key, smsApi.sms_type)
-                    queryParam(smsApi.mobile_key, username)
-                    queryParam(smsApi.sms_text_key, sms)
                 }.build()
             }.retrieve()
             .bodyToMono(String::class.java)
             .block()
     }
 
+    private fun generateRandomNewOtp(): String {
+        var otp = ""
+        do {
+            otp = generateFiveDigitOtp()
+        } while (smsLogRepository.existsByOtp(otp))
+        return otp
+    }
 
     private fun generateFiveDigitOtp(): String {
-        val otp: StringBuilder = StringBuilder()
-        (1..5).forEach {
+        val otp: StringBuilder = StringBuilder(OTP_LENGTH)
+        (1..OTP_LENGTH).forEach {
             val digit = (1..9).random()
             otp.append(digit)
         }

@@ -1,59 +1,33 @@
 package com.haatehaate.registration
 
 import com.haatehaate.entity.User
-import com.haatehaate.exception.InvalidRegistrationException
 import com.haatehaate.otp.OtpRequest
 import com.haatehaate.otp.SmsService
 import com.haatehaate.registration.dto.RegistrationRequest
-import com.haatehaate.repository.UserRepository
+import com.haatehaate.service.UserService
 import org.springframework.stereotype.Service
 
 @Service
 class RegistrationService(
-    private val userRepository: UserRepository,
+    private val userService: UserService,
     private val smsService: SmsService
 ) {
 
-    fun completeUserRegistration(otpRequest: OtpRequest) {
-        checkIfUserHasCompletedOtpRequest(otpRequest.username)
-        validateOtp(otpRequest)
-    }
-
-    private fun checkIfUserHasCompletedOtpRequest(username: String) {
-        if (!userRepository.existsUserByUsernameAndOtpVerifiedIsFalse(username)) {
-            throw InvalidRegistrationException("Username $username did not complete OTP request.")
-        }
-    }
-
-    private fun validateOtp(otpRequest: OtpRequest) {
-        smsService.validateOtp(otpRequest)
-    }
-
     fun registerNewUser(registrationRequest: RegistrationRequest) {
-        checkIfUserIsAlreadyRegistered(registrationRequest.username)
-        sendOtp(registrationRequest)
-        registerUserWithOtpPending(registrationRequest)
-    }
-
-    private fun checkIfUserIsAlreadyRegistered(username: String) {
-        if (userRepository.existsUserByUsernameAndOtpVerifiedIsTrue(username)) {
-            throw InvalidRegistrationException("Username $username is already registered. Please login with credentials.")
-        }
-    }
-
-    private fun sendOtp(registrationRequest: RegistrationRequest) {
+        userService.checkIfUserIsAlreadyRegistered(registrationRequest.username)
         smsService.sendOtp(registrationRequest.username)
+        userService.registerUserWithOtpPending(registrationRequest.username, registrationRequest.password)
     }
 
-    private fun registerUserWithOtpPending(registrationRequest: RegistrationRequest) {
-        val username = registrationRequest.username
-        val password = registrationRequest.password
-        val otpNotVerifiedUser = User(username = username, password = password)
+    fun completeUserRegistration(otpRequest: OtpRequest): User {
+        userService.checkIfUserIsAlreadyRegistered(otpRequest.username)
+        userService.checkIfUserHasCompletedOtpRequest(otpRequest.username)
+        smsService.validateOtp(otpRequest)
+        return userService.registerUserWithOtpVerified(otpRequest.username)
+    }
 
-        val user = userRepository.findUserByUsername(registrationRequest.username).orElse(otpNotVerifiedUser)
-        user.username = username
-        user.password = password
-
-        userRepository.save(user)
+    fun retryRegistrationWithNewOtp(username: String) {
+        userService.checkIfUserIsAlreadyRegistered(username)
+        smsService.sendOtp(username)
     }
 }

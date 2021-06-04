@@ -28,20 +28,20 @@ class AuthExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(InvalidLoginException::class)
     fun handleInvalidLoginException(ex: InvalidLoginException): LoginResponse {
-        return LoginResponse(error = LoginResponse.Error(ex.reason))
+        return LoginResponse(error = LoginResponse.Error(ex.reason, ex.path))
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(InvalidRegistrationException::class)
     fun handleInvalidRegistrationException(ex: InvalidRegistrationException): RegistrationResponse {
-        return RegistrationResponse(error = RegistrationResponse.Error(reason = ex.reason))
+        return RegistrationResponse(error = RegistrationResponse.Error(reason = ex.reason, path = ex.path))
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(OtpException::class)
     fun handleOtpException(ex: OtpException): RegistrationResponse {
-        return RegistrationResponse(error = RegistrationResponse.Error(reason = ex.reason))
+        return RegistrationResponse(error = RegistrationResponse.Error(reason = ex.reason, path = ex.path))
     }
 }

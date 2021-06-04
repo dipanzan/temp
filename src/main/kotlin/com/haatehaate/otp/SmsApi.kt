@@ -22,18 +22,22 @@ data class SmsApi(
         private val log = logger()
     }
 
-    fun parseSmsResponse(response: String?): SmsApiResponse? {
+    fun parseSmsResponse(response: String?): Response? {
         return response?.let {
             val tokens = it.split(response_separator)
             val responseCode = tokens[0].toInt()
             val recipientNumber = tokens[1]
             val responseId = tokens[2]
 
-            SmsApiResponse(responseCode, recipientNumber, responseId)
+            Response(responseCode, recipientNumber, responseId)
         }
     }
 
-    data class SmsApiResponse(
+    fun getResponseStatus(code: Int): ResponseStatusCodes {
+        return ResponseStatusCodes.values().single() { it.code == code }
+    }
+
+    data class Response(
         val responseCode: Int,
         val recipientNumber: String,
         val responseId: String
@@ -53,12 +57,5 @@ data class SmsApi(
         DUPLICATE_CAMPAIGN_NAME(1909),
         INVALID_MESSAGE(1910),
         TOO_MANY_SMS_REQUEST(1911);
-
-
-        companion object {
-            fun getResponseStatus(code: Int): ResponseStatusCodes {
-                return values().single { it.code == code }
-            }
-        }
     }
 }

@@ -3,7 +3,7 @@ package com.haatehaate.entity
 import java.time.LocalDateTime
 import javax.persistence.*
 
-@Entity
+@Entity(name = "User")
 @Table(name = "users")
 data class User(
     @Id
@@ -18,12 +18,28 @@ data class User(
     var password: String,
 
     @Column(name = "otp_verified", nullable = false)
-    var otpVerified: Boolean = false,
+    var otpVerified: Boolean,
+
+    @JoinColumn(name = "token_id")
+    @OneToOne(cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    var token: Token? = null,
 
     @Column(name = "registered_at")
     var registeredAt: LocalDateTime = LocalDateTime.now()
 
-    /*@OneToOne(cascade = [CascadeType.ALL])
-    @JoinColumn(name = "verification_id", referencedColumnName = "id")
-    var verification: Verification*/
-)/* : BaseEntity()*/
+) {
+    fun setOtpVerified(otpVerified: Boolean): User {
+        this.otpVerified = otpVerified
+        return this
+    }
+
+    fun setToken(token: Token): User {
+        this.token = token
+        return this
+    }
+
+    fun setRegisteredAt(registeredAt: LocalDateTime): User {
+        this.registeredAt = registeredAt
+        return this
+    }
+}
