@@ -1,7 +1,5 @@
 package com.haatehaate.entity
 
-import javax.persistence.*
-
 /*
 @Entity
 @Table(name = "verification")

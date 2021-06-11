@@ -10,8 +10,8 @@ import java.util.*
 @Repository
 interface UserRepository : JpaRepository<User, Long> {
     fun findUserByUsername(username: String): Optional<User>
-    fun existsUserByUsername(username: String): Boolean
-    fun existsUserByUsernameAndOtpVerifiedIsTrue(username: String): Boolean
+    fun existsByUsernameAndOtpVerifiedIsTrue(username: String): Boolean
+    fun existsByUsernameAndOtpVerifiedIsFalse(username: String): Boolean
     fun findUserByUsernameAndPassword(username: String, password: String): Optional<User>
     fun findUserByUsernameAndOtpVerifiedIsFalse(username: String): Optional<User>
 }
